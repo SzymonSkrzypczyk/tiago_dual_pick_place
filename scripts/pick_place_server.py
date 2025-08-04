@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2016 PAL Robotics SL. All Rights Reserved
@@ -184,12 +184,12 @@ class PickAndPlaceServer(object):
         self.octomap_pub.publish(ros_point_cloud)
 
     def start_mapping(self):
-		# start forwarding the point cloud to the moveit octomap server topic
+        # start forwarding the point cloud to the moveit octomap server topic
         self.forward_pcl_sub = rospy.Subscriber(self.pcl_topic_name, PointCloud2, self.forward_pcl_sub_cback, queue_size=1)
-		# # Clear existing octomap here?
-		# rospy.sleep(1.0)
-		# rospy.loginfo("Clearing octomap")
-		# self.clear_octomap_srv.call(EmptyRequest())
+        # # Clear existing octomap here?
+        # rospy.sleep(1.0)
+        # rospy.loginfo("Clearing octomap")
+        # self.clear_octomap_srv.call(EmptyRequest())
 
     def stop_mapping(self):
         # stop forwarding the point cloud to the moveit octomap server topic

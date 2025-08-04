@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2016 PAL Robotics SL. All Rights Reserved
@@ -72,7 +72,7 @@ def quaternion_from_vectors(v0, v1):
     except ValueError:
         s = 0.0
     if s == 0.0:
-        # print "s == 0.0, we cant compute"
+        # print("s == 0.0, we cant compute")
         return None  # [0.0, 0.0, 0.0, 1.0]
 
     q = [0.0, 0.0, 0.0, 0.0]

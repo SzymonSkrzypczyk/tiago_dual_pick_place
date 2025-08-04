@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python3
 
 # Copyright (c) 2016 PAL Robotics SL. All Rights Reserved
 #
@@ -24,7 +24,7 @@
 import rospy
 import time
 from tiago_dual_pick_place.msg import PlaceAutoObjectAction, PlaceAutoObjectGoal, PickUpObjectAction, PickUpObjectGoal, PickPlacePoseAction, PickPlacePoseGoal
-from tiago_dual_pick_place.srv import PickPlaceObject, PickPlaceObjects, PickPlaceAutoObject, PickPlaceSimple
+from tiago_msgs.srv import PickPlaceObject, PickPlaceObjects, PickPlaceAutoObject, PickPlaceSimple
 from geometry_msgs.msg import PoseStamped, Pose
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from play_motion_msgs.msg import PlayMotionAction, PlayMotionGoal

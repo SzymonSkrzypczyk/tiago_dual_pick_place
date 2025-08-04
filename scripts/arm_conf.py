@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 class ArmConf(object):
     def __init__(self, group_arm, group_arm_torso, grasp_frame, gripper_joints):
         self.group_arm = group_arm
