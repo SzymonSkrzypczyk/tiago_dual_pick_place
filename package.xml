@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="3">
   <name>tiago_dual_pick_place</name>
   <version>1.0.0</version>
   <description>TIAGo++ pick and place pipeline</description>

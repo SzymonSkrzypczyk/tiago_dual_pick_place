@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.10.2)
 project(tiago_dual_pick_place)
 
 find_package(catkin REQUIRED COMPONENTS
