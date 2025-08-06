@@ -4,10 +4,10 @@
   <arg name="rviz" default="true"/>
 
   <!-- Load the robot description -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find tiago_dual_moveit_config)/urdf/tiago_dual.urdf.xacro'" />
+  <!-- <param name="robot_description" command="$(find xacro)/xacro '$(find tiago_dual_moveit_config)/urdf/tiago_dual.urdf.xacro'" /> -->
 
   <!-- Load definition of pregrasp motion into play_motion namespace -->
-  <!-- <rosparam command="load" file="$(find tiago_dual_pick_place)/config/pick_motions.yaml" />  -->
+  <rosparam command="load" file="$(find tiago_dual_pick_place)/config/pick_motions.yaml" /> 
 
   <!-- Include MoveIt! Configuration -->
   <!-- <include file="$(find tiago_dual_moveit_config)/launch/move_group.launch" /> -->
