@@ -394,7 +394,7 @@ class PickPlace(object):
         jt.joint_names = ['head_1_joint', 'head_2_joint']
         jtp = JointTrajectoryPoint()
         # though might not make much sense! 
-        jtp.positions = [-0.75 if left_right[0] == "l" else 0.75, -0.75]
+        jtp.positions = [0.75 if left_right[0] == "l" else -0.75, -0.75]
         jtp.time_from_start = rospy.Duration(2.0)
         jt.points.append(jtp)
         self.head_cmd.publish(jt)
