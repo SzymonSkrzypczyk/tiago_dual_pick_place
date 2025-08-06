@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 
 # Copyright (c) 2016 PAL Robotics SL. All Rights Reserved
 #
@@ -24,11 +24,12 @@
 import rospy
 import time
 from tiago_dual_pick_place.msg import PlaceAutoObjectAction, PlaceAutoObjectGoal, PickUpObjectAction, PickUpObjectGoal, PickPlacePoseAction, PickPlacePoseGoal
-from tiago_msgs.srv import PickPlaceObject, PickPlaceObjects, PickPlaceAutoObject, PickPlaceSimple
+from tiago_dual_pick_place.srv import PickPlaceObject, PickPlaceObjects, PickPlaceAutoObject, PickPlaceSimple
 from geometry_msgs.msg import PoseStamped, Pose
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from play_motion_msgs.msg import PlayMotionAction, PlayMotionGoal
 from actionlib import SimpleActionClient
+from sensor_msgs.msg import Image
 
 import copy
 
@@ -122,6 +123,7 @@ class PickPlace(object):
 
         rospy.loginfo("Waiting for '/play_motion' AS...")
         self.play_m_as = SimpleActionClient('/play_motion', PlayMotionAction)
+
         if not self.play_m_as.wait_for_server(rospy.Duration(20)):
             rospy.logerr("Could not connect to /play_motion AS")
             exit()
@@ -149,10 +151,12 @@ class PickPlace(object):
         goal = PickUpObjectGoal()
         goal.left_right = left_right
         goal.object_name = object_name
+        rospy.loginfo(f"Goal: {goal}")
         rospy.loginfo("Sending pick command...")
         self.pick_obj_as.send_goal_and_wait(goal)
 
         result = self.pick_obj_as.get_result()
+        rospy.loginfo(f"result: {result}")
         if str(moveit_error_dict[result.error_code]) != "SUCCESS":
             rospy.logerr("Failed to pick, not trying further")
             return result.error_code
@@ -384,12 +388,13 @@ class PickPlace(object):
         jt.points.append(jtp)
         self.torso_cmd.publish(jt)
 
-    def lower_head(self):
-        rospy.loginfo("Moving head down and left")
+    def lower_head(self, left_right):
+        rospy.loginfo(f"Moving head down and {left_right}")
         jt = JointTrajectory()
         jt.joint_names = ['head_1_joint', 'head_2_joint']
         jtp = JointTrajectoryPoint()
-        jtp.positions = [0.75, -0.75]
+        # though might not make much sense! 
+        jtp.positions = [-0.75 if left_right[0] == "l" else 0.75, -0.75]
         jtp.time_from_start = rospy.Duration(2.0)
         jt.points.append(jtp)
         self.head_cmd.publish(jt)
@@ -397,13 +402,13 @@ class PickPlace(object):
 
     def prepare_robot(self, left_right):
         rospy.loginfo("Unfold arm safely")
+        self.lower_head(left_right)
+        
         pmg = PlayMotionGoal()
         pmg.motion_name = 'pregrasp_' + left_right[0]
         pmg.skip_planning = False
         self.play_m_as.send_goal_and_wait(pmg)
         rospy.loginfo("Done.")
-
-        # self.lower_head()
 
         rospy.loginfo("Robot prepared.")
 

@@ -3,8 +3,9 @@ project(tiago_dual_pick_place)
 
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
-  actionlib
+  message_generation
   actionlib_msgs
+  actionlib
   geometry_msgs
   moveit_msgs
   rospy
@@ -35,10 +36,11 @@ add_service_files(
 
 generate_messages(
   DEPENDENCIES
-  actionlib_msgs geometry_msgs
+  actionlib_msgs geometry_msgs std_msgs
 )
 
 catkin_package(
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 )
 
 include_directories(
@@ -53,6 +55,9 @@ install(PROGRAMS
         scripts/arm_conf.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+install(DIRECTORY models/
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/models)
 
 install(DIRECTORY launch config
    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
