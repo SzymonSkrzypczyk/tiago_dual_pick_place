@@ -4,13 +4,13 @@
   <arg name="rviz" default="true"/>
 
   <!-- Load the robot description -->
-  <!-- <param name="robot_description" command="$(find xacro)/xacro '$(find tiago_dual_moveit_config)/urdf/tiago_dual.urdf.xacro'" /> -->
+  <param name="robot_description_semantic" command="$(find xacro)/xacro '$(find tiago_dual_moveit_config)/config/srdf/tiago_dual.srdf.xacro'" />
 
   <!-- Load definition of pregrasp motion into play_motion namespace -->
   <rosparam command="load" file="$(find tiago_dual_pick_place)/config/pick_motions.yaml" /> 
 
   <!-- Include MoveIt! Configuration -->
-  <!-- <include file="$(find tiago_dual_moveit_config)/launch/move_group.launch" /> -->
+  <include file="$(find tiago_dual_moveit_config)/launch/move_group.launch" />
 
   <!-- Pick & place server -->
   <node name="pick_place_server" pkg="tiago_dual_pick_place" type="pick_place_server.py" output="screen">

@@ -1,5 +1,7 @@
 ### Modified params for Robotiq gripper
 
+use_sim_time: false
+
 # Desired distance from grasp_postures_frame_id to put the object
 # So, the grasping point
 grasp_desired_distance: 0.20
