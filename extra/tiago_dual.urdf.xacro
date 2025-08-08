@@ -15,8 +15,8 @@
     <xacro:arg name="wrist_right_model" default="wrist-2010"/>
     <xacro:arg name="end_effector_left" default="pal-gripper"/> <!-- pal-gripper, pal-hey5, schunk-wsg, custom-->
     <xacro:arg name="end_effector_right" default="pal-gripper"/> <!-- pal-gripper, pal-hey5, schunk-wsg, custom-->
-    <xacro:arg name="ft_sensor_left" default="schunk-ft"/> <!-- false, schunk-ft -->
-    <xacro:arg name="ft_sensor_right" default="schunk-ft"/> <!-- false, schunk-ft -->
+    <xacro:arg name="ft_sensor_left" default="false"/> <!-- false, schunk-ft -->
+    <xacro:arg name="ft_sensor_right" default="false"/> <!-- false, schunk-ft -->
     <xacro:arg name="laser_model" default="sick-571"/> <!-- false, hokuyo, sick-551, sick-561, sick-571-->
     <xacro:arg name="camera_model" default="orbbec-astra"/> <!-- false, orbbec-astra, orbbec-astra-pro, asus-xtion -->
     <xacro:arg name="has_screen" default="false"/> <!-- true, false -->
