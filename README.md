@@ -95,3 +95,5 @@ pose:
 2. Call the place service, either by specifiying left/right arm or the object name:
     1. To place at the specified target pose (on timeout: the pickup pose): `rosservice call /place left`
     2. To place an object with the name 'Box_0' at the specified pose (on timeout: the pickup pose): `rosservice call /place_object 'Box_0'`
+
+For `/robot_description` clone this repo to src: https://github.com/pal-robotics/tiago_dual_robot
