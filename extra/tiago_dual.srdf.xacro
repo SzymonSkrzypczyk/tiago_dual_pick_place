@@ -69,6 +69,9 @@
     <xacro:macro name="end_effector_for_side" params="side end_effector">
         <xacro:include filename="$(find tiago_dual_moveit_config)/config/srdf/${robot}_${end_effector}_${end_effector}.srdf" />
     <!-- <xacro:define_end_effector arm="arm_${side}" name="${end_effector_name}_${side}"/> -->
+    
+    <!-- Define end-effector for MoveIt! pickup/place capabilities -->
+    <end_effector name="gripper_${side}" parent_link="arm_${side}_tool_link" group="gripper_${side}" parent_group="arm_${side}"/>
 </xacro:macro>
 
 <xacro:if value="${has_arm_left}">
