@@ -97,3 +97,7 @@ pose:
     2. To place an object with the name 'Box_0' at the specified pose (on timeout: the pickup pose): `rosservice call /place_object 'Box_0'`
 
 For `/robot_description` clone this repo to src: https://github.com/pal-robotics/tiago_dual_robot
+
+## Required env variables: 
+**ROS_MASTER_URI**
+**ROS_IP**
