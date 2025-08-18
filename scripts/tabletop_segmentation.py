@@ -1,64 +1,68 @@
 #!/usr/bin/env python3
 
 import rospy
-import sensor_msgs.point_cloud2 as pc2
+import ros_numpy
+import numpy as np
+import open3d as o3d
+
 from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseStamped
-from moveit_commander import PlanningSceneInterface, roscpp_initialize, roscpp_shutdown
-
-import pcl
-import pcl.pcl_visualization
-import numpy as np
+from moveit_commander import PlanningSceneInterface
 
 
 class TabletopSegmentation:
     def __init__(self):
-        roscpp_initialize([])
-        rospy.init_node('tabletop_segmentation_node', anonymous=True)
+        rospy.init_node("tabletop_segmentation_node", anonymous=True)
         self.scene = PlanningSceneInterface()
-        rospy.sleep(2)
+        rospy.sleep(2.0)
 
-        # Subscribe to TIAGo depth camera pointcloud
-        rospy.Subscriber("/xtion/depth_registered/points", PointCloud2, self.cloud_cb)
-        rospy.loginfo("Subscribed to pointcloud topic.")
+        rospy.Subscriber("/xtion/depth_registered/points", PointCloud2, self.cloud_cb, queue_size=1)
+        rospy.loginfo("Subscribed to depth camera point cloud")
+
         rospy.spin()
 
     def cloud_cb(self, cloud_msg):
-        # Convert ROS -> PCL
-        points_list = []
-        for p in pc2.read_points(cloud_msg, skip_nans=True):
-            points_list.append([p[0], p[1], p[2]])
-        cloud = pcl.PointCloud()
-        cloud.from_list(points_list)
+        pc = ros_numpy.point_cloud2.pointcloud2_to_array(cloud_msg)
 
-        # 1. Plane segmentation (remove table)
-        seg = cloud.make_segmenter_normals(ksearch=50)
-        seg.set_optimize_coefficients(True)
-        seg.set_model_type(pcl.SACMODEL_PLANE)
-        seg.set_method_type(pcl.SAC_RANSAC)
-        seg.set_distance_threshold(0.01)
-        indices, model = seg.segment()
+        points = np.zeros((pc.shape[0], 3), dtype=np.float32)
+        points[:, 0] = pc['x']
+        points[:, 1] = pc['y']
+        points[:, 2] = pc['z']
 
-        cloud_objects = cloud.extract(indices, negative=True)
+        mask = ~np.isnan(points).any(axis=1)
+        points = points[mask]
 
-        # 2. Clustering objects
-        tree = cloud_objects.make_kdtree()
-        ec = cloud_objects.make_EuclideanClusterExtraction()
-        ec.set_ClusterTolerance(0.02)  # 2cm
-        ec.set_MinClusterSize(100)
-        ec.set_MaxClusterSize(25000)
-        ec.set_SearchMethod(tree)
-        cluster_indices = ec.Extract()
+        if points.shape[0] == 0:
+            rospy.logwarn("No valid points in cloud")
+            return
 
-        rospy.loginfo("Found %d clusters (objects)" % len(cluster_indices))
+        cloud_o3d = o3d.geometry.PointCloud()
+        cloud_o3d.points = o3d.utility.Vector3dVector(points)
+        cloud_o3d = cloud_o3d.voxel_down_sample(voxel_size=0.01)
 
-        # Clear old objects
+        _, inliers = cloud_o3d.segment_plane(
+            distance_threshold=0.01,
+            ransac_n=3,
+            num_iterations=1000
+        )
+        objects_cloud = cloud_o3d.select_by_index(inliers, invert=True)
+
+        labels = np.array(objects_cloud.cluster_dbscan(
+            eps=0.03, min_points=50, print_progress=False))
+
+        if labels.max() == -1:
+            rospy.logwarn("No clusters found")
+            return
+
+        rospy.loginfo(f"Detected {labels.max() + 1} objects")
+
         for i in range(5):
-            self.scene.remove_world_object("Box_%d" % i)
+            self.scene.remove_world_object(f"Box_{i}")
 
-        # 3. Add clusters as boxes
-        for i, indices in enumerate(cluster_indices):
-            pts = np.array([cloud_objects[j] for j in indices])
+        for i in range(labels.max() + 1):
+            cluster = objects_cloud.select_by_index(np.where(labels == i)[0])
+            pts = np.asarray(cluster.points)
+
             centroid = np.mean(pts, axis=0)
             min_pt = np.min(pts, axis=0)
             max_pt = np.max(pts, axis=0)
@@ -66,18 +70,18 @@ class TabletopSegmentation:
 
             pose = PoseStamped()
             pose.header.frame_id = cloud_msg.header.frame_id
-            pose.pose.position.x = centroid[0]
-            pose.pose.position.y = centroid[1]
-            pose.pose.position.z = centroid[2]
+            pose.pose.position.x = float(centroid[0])
+            pose.pose.position.y = float(centroid[1])
+            pose.pose.position.z = float(centroid[2])
             pose.pose.orientation.w = 1.0
 
-            name = "Box_%d" % i
-            self.scene.add_box(name, pose, size=size)
-            rospy.loginfo("Added object %s at %s" % (name, str(centroid)))
+            name = f"Box_{i}"
+            self.scene.add_box(name, pose, size=tuple(size))
+            rospy.loginfo(f"Added {name} at {centroid} with size {size}")
+
 
 if __name__ == "__main__":
     try:
         TabletopSegmentation()
     except rospy.ROSInterruptException:
         pass
-    roscpp_shutdown()

@@ -37,4 +37,5 @@
   <run_depend>std_srvs</run_depend>
   <run_depend>tf2_ros</run_depend>
   <run_depend>tf2_geometry_msgs</run_depend>
+  <exec_depend>ros-numpy</exec_depend>
 </package>
