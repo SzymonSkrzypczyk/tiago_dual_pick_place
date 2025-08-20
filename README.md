@@ -98,6 +98,4 @@ pose:
 
 For `/robot_description` clone this repo to src: https://github.com/pal-robotics/tiago_dual_robot
 
-## Required env variables: 
-**ROS_MASTER_URI**
-**ROS_IP**
+## [Troubleshooting guide](How2Troubleshoot.md)
